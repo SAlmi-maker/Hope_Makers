@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Message for the Children</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0b12;
+    --card: #141420;
+    --muted: #9ca3af;
+    --text: #e5e7eb;
+    --accent: #7c3aed;
+    --shadow: 0 8px 24px rgba(0,0,0,0.6);
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .hero {
+    position: relative;
+    height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+    background: #1a1a2e;
+  }
+  .hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.35;
+  }
+  .hero h1 {
+    position: absolute;
+    color: #fff;
+    font-size: 36px;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 30px;
+  }
+
+  @media (max-width: 900px) {
+    .container {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .info {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 30px;
+  }
+
+  .info h2 {
+    font-size: 28px;
+    margin-top: 0;
+    color: #fff;
+  }
+
+  .info p {
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  label {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #3f3f46;
+    border-radius: 10px;
+    font-size: 15px;
+    background: #1e1e2f;
+    color: #e5e7eb;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .btn {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(124,58,237,0.4);
+    transition: background 0.3s ease;
+  }
+
+  .btn:hover {
+    background: #5b21b6;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .image-box {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+  }
+
+  .map {
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    height: 280px;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  footer {
+    margin-top: 50px;
+    background: #111121;
+    color: #c7d2fe;
+    padding: 20px;
+    text-align: center;
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <img src="./hero.png" alt="Background banner">
+  <h1>Message for the Children</h1>
+</header>
+
+<main class="container">
+
+  <section class="info">
+    <h2>Share Your Kind Words</h2>
+    <p>We’d love to hear your heartfelt message for the children. Please include your name, your country, and your words of hope. You can also share your Instagram or WhatsApp if you’d like (optional).</p>
+
+    <form action="https://formspree.io/f/mjkpjdya" method="POST">
+      <div>
+        <label for="name">Full Name *</label>
+        <input type="text" id="name" name="name" required placeholder="Your full name">
+      </div>
+
+      <div>
+        <label for="country">Country / Location *</label>
+        <input type="text" id="country" name="country" required placeholder="Where are you from?">
+      </div>
+
+      <div>
+        <label for="message">Message for the Children *</label>
+        <textarea id="message" name="message" required placeholder="Write your message..."></textarea>
+      </div>
+
+      <div>
+        <label for="instagram">Instagram Link (optional)</label>
+        <input type="url" id="instagram" name="instagram" placeholder="https://instagram.com/yourprofile">
+      </div>
+
+      <div>
+        <label for="whatsapp">WhatsApp Number (optional)</label>
+        <input type="text" id="whatsapp" name="whatsapp" placeholder="+1 234 567 890">
+      </div>
+
+      <button type="submit" class="btn">Send Message</button>
+    </form>
+  </section>
+
+  <aside class="sidebar">
+    <div class="image-box">
+      <img src="./card.png" alt="Children or organization image">
+    </div>
+
+    <div class="map">
+      <iframe src="https://www.google.com/maps?q=35.145931529867326,-2.9067793672458007&hl=en&z=14&output=embed" loading="lazy" title="Our location"></iframe>
+    </div>
+  </aside>
+</main>
+
+<footer>
+  © 2025 Hope for Children — All rights reserved.
+</footer>
+
+</body>
+</html>

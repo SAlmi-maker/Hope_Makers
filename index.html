@@ -1,306 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- Favicon -->
+<link rel="icon" href="/favicon.png" type="image/png" sizes="64x64">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Message for the Children</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0b0b12;
-    --card: #141420;
-    --muted: #9ca3af;
-    --text: #e5e7eb;
-    --accent: #7c3aed;
-    --shadow: 0 8px 24px rgba(0,0,0,0.6);
-    --radius: 14px;
-  }
-
-  * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
-  }
-
-  .hero {
-    position: relative;
-    height: 260px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-bottom-left-radius: 24px;
-    border-bottom-right-radius: 24px;
-    background: #1a1a2e;
-  }
-  .hero img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.35;
-  }
-  .hero h1 {
-    position: absolute;
-    color: #fff;
-    font-size: 36px;
-    text-shadow: 0 4px 10px rgba(0,0,0,0.8);
-  }
-
-  .container {
-    max-width: 1100px;
-    margin: 40px auto;
-    padding: 0 20px;
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 30px;
-  }
-
-  @media (max-width: 900px) {
-    .container {
-      grid-template-columns: 1fr;
-      padding: 0 14px;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JOSKA — Early Access</title>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .hero {
-      height: 200px;
+    html {
+      scroll-behavior: smooth;
     }
-    .hero h1 {
-      font-size: 26px;
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: #0a0a0a;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+      color: white;
+    }
+    .card {
+      width: 100%;
+      max-width: 560px;
+      padding: 60px 48px;
+      border-radius: 36px;
+      background: rgba(30, 30, 40, 0.18);
+      backdrop-filter: blur(36px) saturate(200%);
+      -webkit-backdrop-filter: blur(36px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow:
+        0 40px 100px rgba(0, 0, 0, 0.7),
+        inset 0 0 80px rgba(255, 255, 255, 0.08),
+        inset -80px -80px 140px -50px rgba(180, 220, 255, 0.20);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.18) 0%,
+        rgba(255,255,255,0.06) 40%,
+        transparent 70%
+      );
+      pointer-events: none;
+      border-radius: 36px;
+    }
+    .card::after {
+      content: "";
+      position: absolute;
+      top: -40%;
+      left: -40%;
+      width: 180%;
+      height: 180%;
+      background: radial-gradient(
+        circle at 25% 25%,
+        rgba(220, 240, 255, 0.22) 0%,
+        transparent 60%
+      );
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    h1 {
+      font-size: clamp(2.2rem, 6vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -1.4px;
+      color: white;
+      margin-bottom: 20px;
+      text-shadow: 0 6px 24px rgba(0,0,0,0.8);
       text-align: center;
-      padding: 0 10px;
     }
-    .info {
-      padding: 22px;
+    .light {
+      font-weight: 300;
+      opacity: 0.84;
     }
-    .info h2 {
-      font-size: 22px;
+    .subtitle {
+      font-size: 1.3rem;
+      color: #cccccc;
+      line-height: 1.58;
+      margin-bottom: 56px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
     }
-    input, textarea {
-      font-size: 14px;
-      padding: 9px 10px;
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 440px;
+      margin: 0 auto;
     }
-    .btn {
-      padding: 10px 14px;
-      font-size: 15px;
+    input {
+      width: 100%;
+      padding: 20px 24px;
+      font-size: 1.15rem;
+      background: rgba(40, 40, 50, 0.55);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 18px;
+      color: white;
+      outline: none;
+      transition: all 0.3s ease;
     }
-    .sidebar {
-      gap: 16px;
+    input:focus {
+      border-color: rgba(255,255,255,0.45);
+      box-shadow: 0 0 0 5px rgba(255,255,255,0.12);
     }
-    .image-box {
-      height: 200px;
+    input::placeholder {
+      color: #aaa;
     }
-    .map {
-      height: 240px;
+    button {
+      padding: 20px 36px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #363636;
+      background: #ffffff;
+      border: none;
+      border-radius: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
-  }
-
-  @media (max-width: 500px) {
-    .hero {
-      height: 160px;
+    button:hover {
+      background: #eeeeee;
+      transform: translateY(-2px);
     }
-    .hero h1 {
-      font-size: 20px;
+    .success-message {
+      color: #55ff88;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+      margin: 32px 0;
+      display: none;
     }
-    .info h2 {
-      font-size: 20px;
+    .privacy {
+      margin-top: 64px;
+      margin-bottom: 32px;
+      font-size: 0.95rem;
+      color: #999;
+      line-height: 1.6;
+      text-align: center;
     }
-    .info {
-      padding: 18px;
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 0;
     }
-    input, textarea {
-      font-size: 13px;
-      padding: 8px;
+    .social-links a {
+      color: #ffffff;
+      font-size: 2rem;
+      text-decoration: none;
+      opacity: 0.85;
+      transition: all 0.3s ease;
     }
-    .btn {
-      padding: 9px 12px;
-      font-size: 14px;
-      border-radius: 8px;
+    .social-links a:hover {
+      opacity: 1;
+      transform: translateY(-4px);
     }
-    .image-box {
-      height: 160px;
+    @media (max-width: 560px) {
+      .card { padding: 48px 32px; }
+      h1 { font-size: clamp(2.1rem, 7vw, 3.2rem); }
+      .subtitle { font-size: 1.18rem; }
+      .privacy { margin-top: 56px; margin-bottom: 28px; }
+      .social-links { gap: 36px; }
+      .social-links a { font-size: 1.8rem; }
     }
-    .map {
-      height: 200px;
-    }
-  }
-  }
-
-  .info {
-    background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 30px;
-  }
-
-  .info h2 {
-    font-size: 28px;
-    margin-top: 0;
-    color: #fff;
-  }
-
-  .info p {
-    color: var(--muted);
-    margin-bottom: 24px;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  label {
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-
-  input, textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #3f3f46;
-    border-radius: 10px;
-    font-size: 15px;
-    background: #1e1e2f;
-    color: #e5e7eb;
-  }
-
-  textarea {
-    resize: vertical;
-    min-height: 120px;
-  }
-
-  .btn {
-    background: var(--accent);
-    color: #fff;
-    font-weight: 600;
-    border: none;
-    padding: 12px 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(124,58,237,0.4);
-    transition: background 0.3s ease;
-  }
-
-  .btn:hover {
-    background: #5b21b6;
-  }
-
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .image-box {
-    background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    height: 240px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .image-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.85;
-  }
-
-  .map {
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    height: 280px;
-  }
-
-  iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
-  }
-
-  footer {
-    margin-top: 50px;
-    background: #111121;
-    color: #c7d2fe;
-    padding: 20px;
-    text-align: center;
-    border-top-left-radius: 14px;
-    border-top-right-radius: 14px;
-  }
-</style>
+  </style>
 </head>
 <body>
+  <div class="card">
+    <h1>
+      JOSKA, <span class="light">DROP 101.</span><br>
+    </h1>
+    <div class="subtitle">
+      Once it's gone, it's gone.
+    </div>
 
-<header class="hero">
-  <img src="./hero.png" alt="Background banner">
-  <h1>Message for the Children</h1>
-</header>
-
-<main class="container">
-
-  <section class="info">
-    <h2>Share Your Kind Words</h2>
-    <p>We’d love to hear your heartfelt message for the children. Please include your name, your country, and your words of hope. You can also share your Instagram or WhatsApp if you’d like (optional) We will send you your donor pass as soon as possible.</p>
-
-    <form action="https://formspree.io/f/mjkpjdya" method="POST">
-      <div>
-        <label for="name">Full Name *</label>
-        <input type="text" id="name" name="name" required placeholder="Your full name">
-      </div>
-
-      <div>
-        <label for="country">Country / Location *</label>
-        <input type="text" id="country" name="country" required placeholder="Where are you from?">
-      </div>
-
-      <div>
-        <label for="email">Email *</label>
-        <input type="email" id="email" name="email" required placeholder="your@email.com">
-      </div>
-
-      <div>
-        <label for="message">Message for the Children *</label>
-        <textarea id="message" name="message" required placeholder="Write your message..."></textarea>
-      </div>
-
-      <div>
-        <label for="instagram">Instagram Link (optional)</label>
-        <input type="url" id="instagram" name="instagram" placeholder="https://instagram.com/yourprofile">
-      </div>
-
-      <div>
-        <label for="whatsapp">WhatsApp Number (optional)</label>
-        <input type="text" id="whatsapp" name="whatsapp" placeholder="+1 234 567 890">
-      </div>
-
-      <button type="submit" class="btn">Send Message</button>
+    <form id="waitlist-form">
+      <input type="text" name="firstname" placeholder="First name" required autocomplete="given-name">
+      <input type="email" name="email" placeholder="Email" required autocomplete="email">
+      <button type="submit">JOIN THE WAITLIST</button>
     </form>
-  </section>
 
-  <aside class="sidebar">
-    <div class="image-box">
-      <img src="./card.png" alt="Children or organization image">
+    <div class="success-message" id="success-message">
+      Order sent successfully! We will contact you soon.
     </div>
 
-    <div class="map">
-      <iframe src="https://www.google.com/maps?q=35.145931529867326,-2.9067793672458007&hl=en&z=14&output=embed" loading="lazy" title="Our location"></iframe>
+    <div class="privacy">
+      All INFORMATION IS PROTECTED BY JOSKA™
     </div>
-  </aside>
-</main>
 
-<footer>
-  © 2025 Hope Makers — All rights reserved.
-</footer>
+    <!-- Social icons -->
+    <div class="social-links">
+      <a href="https://www.instagram.com/official.joska?igsh=ZTMwYWdtYTFmOXk0" target="_blank" title="Instagram">
+        <i class="fab fa-instagram"></i>
+      </a>
+      <a href="https://www.tiktok.com/@joska.store?_r=1&_t=ZS-93hiF821WRV" target="_blank" title="TikTok">
+        <i class="fab fa-tiktok"></i>
+      </a>
+      <a href="mailto:contact@joska.store" title="Email us">
+        <i class="far fa-envelope"></i>
+      </a>
+    </div>
+  </div>
 
+  <script>
+    const form = document.getElementById('waitlist-form');
+    const successMessage = document.getElementById('success-message');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const endpoint = "https://formspree.io/f/mlgezwrr"; // Your Formspree link
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          body: new FormData(form),
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          successMessage.style.display = 'block';
+          form.style.display = 'none'; // Optional: hide form after success
+          form.reset();
+        } else {
+          alert("Something went wrong. Please try again.");
+        }
+      } catch (err) {
+        alert("Network error. Please check your connection.");
+      }
+    });
+  </script>
 </body>
 </html>
-
-
-

@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CV Analyzer — Tailor Your Resume</title>
+  <meta name="description" content="Upload your CV, paste a job description, and get actionable suggestions to tailor your resume." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #2563EB; --primary-hover: #1d4ed8; --primary-light: #eff6ff; --primary-glow: rgba(37,99,235,0.25);
+      --bg-base: #f8fafc; --bg-surface: #ffffff; --bg-subtle: #f1f5f9;
+      --border-color: #e2e8f0; --border-strong: #cbd5e1;
+      --text-primary: #0f172a; --text-secondary: #475569; --text-tertiary: #94a3b8;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.04);
+      --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --radius-xl: 20px; --radius-full: 9999px;
+      --green: #10b981; --green-bg: #ecfdf5; --red: #ef4444; --red-bg: #fef2f2; --yellow: #f59e0b; --yellow-bg: #fffbeb; --orange: #f97316; --orange-bg: #fff7ed;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px; line-height: 1.6; color: var(--text-primary); background: var(--bg-base);
+      -webkit-font-smoothing: antialiased;
+    }
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 260px; background: #0f172a; display: flex; flex-direction: column; flex-shrink: 0;
+      position: sticky; top: 0; height: 100vh;
+    }
+    .sidebar-header { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 12px; }
+    .sidebar-logo { width: 36px; height: 36px; background: #2563EB; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sidebar-logo svg { width: 20px; height: 20px; color: #fff; }
+    .sidebar-brand-name { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: 0.06em; }
+    .sidebar-brand-sub { font-size: 0.72rem; color: rgba(255,255,255,0.35); }
+    .sidebar-nav { flex: 1; padding: 12px 12px; overflow-y: auto; }
+    .sidebar-nav a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
+      color: #94a3b8; text-decoration: none; font-size: 0.88rem; font-weight: 500;
+      transition: all 150ms ease; margin-bottom: 2px;
+    }
+    .sidebar-nav a:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
+    .sidebar-nav a.active { background: rgba(37,99,235,0.15); color: #60a5fa; }
+    .sidebar-nav a svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .sidebar-footer { padding: 16px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .main-area { flex: 1; min-width: 0; padding: 32px 40px; max-width: 1200px; }
+    h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .subtitle { color: var(--text-secondary); margin-bottom: 32px; font-size: 0.95rem; }
+    .card {
+      background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-xl);
+      padding: 28px; box-shadow: var(--shadow-sm); margin-bottom: 24px;
+    }
+    .card-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .card-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; }
+    .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 800px) { .input-grid { grid-template-columns: 1fr; } }
+    .drop-zone {
+      border: 2px dashed var(--border-strong); border-radius: var(--radius-lg); padding: 40px 20px;
+      text-align: center; cursor: pointer; transition: all 200ms ease; background: var(--bg-subtle);
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: var(--primary-light); }
+    .drop-zone.drag-over { transform: scale(1.01); }
+    .drop-zone-icon { width: 48px; height: 48px; margin: 0 auto 12px; color: var(--text-tertiary); }
+    .drop-zone-text { font-weight: 600; color: var(--text-primary); }
+    .drop-zone-hint { font-size: 0.8rem; color: var(--text-tertiary); margin-top: 4px; }
+    .drop-zone.has-file { border-color: var(--green); background: var(--green-bg); }
+    .drop-zone.has-file .drop-zone-icon { color: var(--green); }
+    .file-info { display: none; margin-top: 12px; font-size: 0.85rem; color: var(--text-secondary); align-items: center; gap: 8px; justify-content: center; }
+    .has-file .file-info { display: flex; }
+    .has-file .drop-zone-hint { display: none; }
+    .file-remove { cursor: pointer; color: var(--red); font-weight: 600; font-size: 0.8rem; margin-left: 8px; border: none; background: none; }
+    textarea {
+      width: 100%; padding: 14px; border: 1.5px solid var(--border-color); border-radius: var(--radius-md);
+      font-size: 0.9rem; font-family: inherit; color: var(--text-primary); background: var(--bg-surface);
+      resize: vertical; min-height: 180px; outline: none; transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+    textarea::placeholder { color: var(--text-tertiary); }
+    .textarea-label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; }
+    .actions { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px 24px; border: none; border-radius: var(--radius-md); font-size: 0.9rem;
+      font-weight: 600; cursor: pointer; transition: all 150ms ease; white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 14px var(--primary-glow); }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+    .btn-secondary { background: var(--bg-subtle); color: var(--text-primary); border: 1px solid var(--border-color); }
+    .btn-secondary:hover:not(:disabled) { background: var(--border-color); }
+    .btn svg { width: 18px; height: 18px; }
+    .spinner { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+    .results-section { animation: fadeInUp 0.4s ease both; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .score-ring {
+      width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 2rem; font-weight: 800; position: relative;
+    }
+    .score-ring.low { border: 6px solid var(--red); color: var(--red); }
+    .score-ring.medium { border: 6px solid var(--yellow); color: var(--yellow); }
+    .score-ring.high { border: 6px solid var(--green); color: var(--green); }
+    .score-ring.excellent { border: 6px solid var(--primary); color: var(--primary); }
+    .score-header { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .score-details { flex: 1; }
+    .score-details h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; }
+    .score-details p { color: var(--text-secondary); font-size: 0.9rem; }
+    .gap-list { margin-top: 24px; }
+    .gap-item {
+      background: var(--bg-subtle); border-radius: var(--radius-md); padding: 16px 20px;
+      border-left: 4px solid var(--orange); margin-bottom: 12px;
+    }
+    .gap-item.high { border-left-color: var(--red); }
+    .gap-item.medium { border-left-color: var(--orange); }
+    .gap-item.low { border-left-color: var(--yellow); }
+    .gap-item.matched { border-left-color: var(--green); }
+    .gap-item-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .gap-section-badge {
+      font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: var(--radius-full);
+      background: var(--primary-light); color: var(--primary); letter-spacing: 0.02em;
+    }
+    .gap-name { font-weight: 600; font-size: 0.95rem; }
+    .gap-priority {
+      font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: var(--radius-full);
+      text-transform: uppercase; letter-spacing: 0.03em;
+    }
+    .gap-priority.critical { background: var(--red-bg); color: var(--red); }
+    .gap-priority.important { background: var(--orange-bg); color: var(--orange); }
+    .gap-priority.nice-to-have { background: var(--yellow-bg); color: var(--yellow); }
+    .gap-priority.matched { background: var(--green-bg); color: var(--green); }
+    .gap-suggestion { font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; padding-left: 4px; }
+    .zone-badge {
+      display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; font-weight: 500;
+      padding: 3px 10px; border-radius: var(--radius-full); background: var(--bg-surface); border: 1px solid var(--border-color);
+    }
+    .zone-badge svg { width: 12px; height: 12px; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin: 24px 0; }
+    .stat-card { text-align: center; padding: 16px; background: var(--bg-subtle); border-radius: var(--radius-md); }
+    .stat-card-value { font-size: 1.5rem; font-weight: 800; }
+    .stat-card-value.green { color: var(--green); }
+    .stat-card-value.red { color: var(--red); }
+    .stat-card-value.orange { color: var(--orange); }
+    .stat-card-label { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+    .section-suggestion {
+      margin-top: 16px; background: var(--bg-subtle); border-radius: var(--radius-md); padding: 16px 20px;
+      border-left: 4px solid var(--primary);
+    }
+    .section-suggestion h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+    .section-suggestion p { font-size: 0.85rem; color: var(--text-secondary); }
+    .section-suggestion ul { margin-top: 8px; list-style: none; }
+    .section-suggestion li { font-size: 0.85rem; padding: 4px 0; padding-left: 18px; position: relative; }
+    .section-suggestion li::before { content: '+'; position: absolute; left: 0; color: var(--primary); font-weight: 700; }
+    .tag { display: inline-block; font-size: 0.72rem; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-full); margin: 2px; }
+    .tag.miss { background: var(--red-bg); color: var(--red); }
+    .tag.match { background: var(--green-bg); color: var(--green); }
+    .tag.weak { background: var(--yellow-bg); color: var(--yellow); }
+    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .top-bar-left { display: flex; align-items: center; gap: 12px; }
+    .back-link { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+    .back-link:hover { color: var(--primary); }
+    .back-link svg { width: 16px; height: 16px; }
+    .loading-overlay { display: none; }
+    .loading-overlay.active { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 20px; color: var(--text-secondary); font-weight: 500; }
+    .results-placeholder { text-align: center; padding: 60px 20px; color: var(--text-tertiary); }
+    .results-placeholder svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.4; }
+    .results-placeholder h3 { font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+    .accordion-btn {
+      width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px;
+      background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md);
+      font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 150ms ease; margin-bottom: 4px;
+    }
+    .accordion-btn:hover { background: var(--bg-subtle); }
+    .accordion-btn svg { width: 16px; height: 16px; transition: transform 200ms ease; }
+    .accordion-btn.open svg { transform: rotate(180deg); }
+    .accordion-body { padding: 0 20px 16px; display: none; }
+    .accordion-body.open { display: block; animation: fadeInUp 0.25s ease both; }
+    .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    .theme-toggle-btn {
+      width: 34px; height: 34px; border: 1px solid var(--border-color); border-radius: var(--radius-md);
+      background: var(--bg-subtle); color: var(--text-secondary); display: flex; align-items: center;
+      justify-content: center; cursor: pointer; transition: all 150ms ease;
+    }
+    .theme-toggle-btn:hover { background: var(--border-color); color: var(--text-primary); }
+    .theme-toggle-btn svg { width: 15px; height: 15px; }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-area { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sidebar-brand-name">JOSKA</div>
+        <div class="sidebar-brand-sub">Invoice Management</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="cv-analyzer.html" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        CV Analyzer
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Reports
+      </a>
+      <a href="settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.25);text-align:center;">&copy; 2025 JOSKA</div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-area">
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <a href="dashboard.html" class="back-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Dashboard
+        </a>
+      </div>
+      <div class="topbar-actions">
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle dark mode">
+          <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="theme-icon-sun hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <h1>CV Tailor</h1>
+    <p class="subtitle">Upload your CV, paste a job description — get a gap analysis showing exactly which zones to update.</p>
+
+    <!-- Input Section -->
+    <div class="card">
+      <div class="input-grid">
+        <!-- Left: CV Upload -->
+        <div>
+          <div class="card-title">Your CV</div>
+          <div class="card-desc">Upload or paste your current resume.</div>
+
+          <div class="drop-zone" id="cvDropZone">
+            <div class="drop-zone-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <div class="drop-zone-text">Drop PDF or DOCX here</div>
+            <div class="drop-zone-hint">or click to browse — plain text supported</div>
+            <div class="file-info">
+              <span id="cvFileName"></span>
+              <button class="file-remove" id="cvRemoveBtn">Remove</button>
+            </div>
+          </div>
+          <input type="file" id="cvFileInput" accept=".pdf,.docx,.doc,.txt" style="display:none;" />
+
+          <div style="margin-top:12px;position:relative;">
+            <span class="textarea-label">Or paste your CV text</span>
+            <textarea id="cvText" placeholder="Paste your CV content here..."></textarea>
+          </div>
+        </div>
+
+        <!-- Right: Job Description -->
+        <div>
+          <div class="card-title">Job Description</div>
+          <div class="card-desc">Paste the job ad you're targeting.</div>
+          <div style="position:relative;">
+            <span class="textarea-label">Company requirements</span>
+            <textarea id="jdText" placeholder="Paste the job description, requirements, and preferred qualifications..." style="min-height:300px;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top:20px;">
+        <button class="btn btn-primary" id="analyzeBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Analyze CV
+        </button>
+        <button class="btn btn-secondary" id="resetBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Reset
+        </button>
+      </div>
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <span>Analyzing…</span>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="card hidden results-section" id="resultsCard">
+      <!-- Score -->
+      <div class="score-header">
+        <div class="score-ring" id="scoreRing">
+          <span id="scoreValue">0</span><span style="font-size:0.7em;">%</span>
+        </div>
+        <div class="score-details">
+          <h2 id="scoreLabel">Match Analysis</h2>
+          <p id="scoreSummary">Analysis complete.</p>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row" id="statsRow">
+        <div class="stat-card">
+          <div class="stat-card-value green" id="statMatched">0</div>
+          <div class="stat-card-label">Matched</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value red" id="statMissing">0</div>
+          <div class="stat-card-label">Missing</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value orange" id="statWeak">0</div>
+          <div class="stat-card-label">Weak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value" id="statKeywords" style="color:var(--primary);">0</div>
+          <div class="stat-card-label">JD Keywords</div>
+        </div>
+      </div>
+
+      <!-- Gap / Zone Analysis -->
+      <div style="margin-bottom:16px;">
+        <h3 style="font-size:1rem;font-weight:700;">Zones to Improve</h3>
+        <p style="font-size:0.85rem;color:var(--text-secondary);">Items the JD expects but your CV is missing or underplaying. Each item shows which CV section to add it to.</p>
+      </div>
+      <div id="gapList"></div>
+
+      <!-- CV Section Suggestions -->
+      <div style="margin:24px 0 16px;">
+        <h3 style="font-size:1rem;font-weight:700;">CV Section Rewrites</h3>
+        <p style="font-size:0.85rem;color:var(--text-secondary);">Suggested content updates for each section of your CV.</p>
+      </div>
+      <div id="sectionSuggestions"></div>
+
+      <!-- Keywords Cloud -->
+      <div style="margin-top:24px;" id="keywordsCloud">
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px;">Keyword Comparison</h3>
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">
+          <span class="tag match">Green = In CV</span>
+          <span class="tag miss">Red = Missing</span>
+          <span class="tag weak">Yellow = Weak match</span>
+        </p>
+        <div id="keywordTags"></div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="results-placeholder" id="emptyState">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+      <h3>No analysis yet</h3>
+      <p>Upload your CV and paste a job description above to get started.</p>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  // ── Theme ────────────────────────────────────────────────
+  (function() {
+    const saved = localStorage.getItem('joska_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    if (saved === 'dark') applyDarkStyles();
+    function applyDarkStyles() {
+      const style = document.createElement('style');
+      style.id = 'dark-theme-override';
+      style.textContent = `
+        [data-theme="dark"] { --bg-base: #0a0f1e; --bg-surface: #111827; --bg-subtle: #1e2a3e;
+          --border-color: #1f2e47; --border-strong: #2d3f5e; --text-primary: #f1f5f9;
+          --text-secondary: #94a3b8; --text-tertiary: #475569;
+          --shadow-sm: 0 1px 3px rgba(0,0,0,0.3); --shadow-md: 0 4px 6px rgba(0,0,0,0.35);
+          --shadow-lg: 0 10px 15px rgba(0,0,0,0.4);
+          --primary-light: rgba(37,99,235,0.15); --green-bg: rgba(16,185,129,0.1);
+          --red-bg: rgba(239,68,68,0.1); --yellow-bg: rgba(245,158,11,0.1); --orange-bg: rgba(249,115,22,0.1);
+        }
+        [data-theme="dark"] .drop-zone { background: #1a2235; }
+        [data-theme="dark"] .drop-zone:hover, [data-theme="dark"] .drop-zone.drag-over { background: rgba(37,99,235,0.1); }
+        [data-theme="dark"] .gap-item { background: #1a2235; }
+        [data-theme="dark"] .stat-card { background: #1a2235; }
+        [data-theme="dark"] .section-suggestion { background: #1a2235; }
+        [data-theme="dark"] .tag.match { background: rgba(16,185,129,0.15); }
+        [data-theme="dark"] .tag.miss { background: rgba(239,68,68,0.15); }
+        [data-theme="dark"] .tag.weak { background: rgba(245,158,11,0.15); }
+      `;
+      document.head.appendChild(style);
+    }
+  })();
+
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('joska_theme', next);
+    const sun = document.querySelector('.theme-icon-sun');
+    const moon = document.querySelector('.theme-icon-moon');
+    sun.classList.toggle('hidden', next === 'light');
+    moon.classList.toggle('hidden', next === 'dark');
+    if (next === 'dark') {
+      if (!document.getElementById('dark-theme-override')) {
+        const style = document.createElement('style');
+        style.id = 'dark-theme-override';
+        style.textContent = `
+          [data-theme="dark"] { --bg-base: #0a0f1e; --bg-surface: #111827; --bg-subtle: #1e2a3e;
+            --border-color: #1f2e47; --border-strong: #2d3f5e; --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8; --text-tertiary: #475569;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3); --shadow-md: 0 4px 6px rgba(0,0,0,0.35);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.4);
+            --primary-light: rgba(37,99,235,0.15); --green-bg: rgba(16,185,129,0.1);
+            --red-bg: rgba(239,68,68,0.1); --yellow-bg: rgba(245,158,11,0.1); --orange-bg: rgba(249,115,22,0.1);
+          }
+          [data-theme="dark"] .drop-zone { background: #1a2235; }
+          [data-theme="dark"] .drop-zone:hover, [data-theme="dark"] .drop-zone.drag-over { background: rgba(37,99,235,0.1); }
+          [data-theme="dark"] .gap-item { background: #1a2235; }
+          [data-theme="dark"] .stat-card { background: #1a2235; }
+          [data-theme="dark"] .section-suggestion { background: #1a2235; }
+          [data-theme="dark"] .tag.match { background: rgba(16,185,129,0.15); }
+          [data-theme="dark"] .tag.miss { background: rgba(239,68,68,0.15); }
+          [data-theme="dark"] .tag.weak { background: rgba(245,158,11,0.15); }
+        `;
+        document.head.appendChild(style);
+      }
+    }
+  });
+
+  // ── CV File Upload ───────────────────────────────────────
+  const cvDropZone = document.getElementById('cvDropZone');
+  const cvFileInput = document.getElementById('cvFileInput');
+  const cvFileName = document.getElementById('cvFileName');
+  const cvRemoveBtn = document.getElementById('cvRemoveBtn');
+  const cvText = document.getElementById('cvText');
+
+  cvDropZone.addEventListener('click', () => cvFileInput.click());
+  cvDropZone.addEventListener('dragover', (e) => { e.preventDefault(); cvDropZone.classList.add('drag-over'); });
+  cvDropZone.addEventListener('dragleave', () => cvDropZone.classList.remove('drag-over'));
+  cvDropZone.addEventListener('drop', (e) => {
+    e.preventDefault(); cvDropZone.classList.remove('drag-over');
+    if (e.dataTransfer.files.length) handleCVFile(e.dataTransfer.files[0]);
+  });
+  cvFileInput.addEventListener('change', () => { if (cvFileInput.files.length) handleCVFile(cvFileInput.files[0]); });
+  cvRemoveBtn.addEventListener('click', (e) => { e.stopPropagation(); removeCVFile(); });
+
+  let cvFileData = null;
+
+  function handleCVFile(file) {
+    cvFileData = file;
+    cvFileName.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+    cvDropZone.classList.add('has-file');
+    cvText.style.opacity = '0.4';
+    cvText.disabled = true;
+  }
+
+  function removeCVFile() {
+    cvFileData = null;
+    cvFileInput.value = '';
+    cvDropZone.classList.remove('has-file');
+    cvText.style.opacity = '1';
+    cvText.disabled = false;
+  }
+
+  // ── Utility: Extract text from file ──────────────────────
+  async function extractTextFromFile(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (ext === 'txt') return await file.text();
+    if (ext === 'pdf') {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join(' ') + '\n';
+      }
+      return text;
+    }
+    if (ext === 'docx' || ext === 'doc') {
+      return '(DOCX parsing requires server-side. Please paste the content as text below.)';
+    }
+    throw new Error('Unsupported file type: ' + ext);
+  }
+
+  // ── Analysis Engine ──────────────────────────────────────
+  const SKILL_KEYWORDS = [
+    'python','javascript','typescript','java','c++','c#','ruby','go','rust','swift','kotlin','php','scala','perl','r','dart',
+    'react','angular','vue','svelte','next.js','nuxt','node.js','express','django','flask','spring','rails','laravel','asp.net',
+    'sql','mysql','postgresql','mongodb','redis','elasticsearch','dynamodb','cassandra','mariadb','sqlite','firebase','supabase',
+    'aws','azure','gcp','cloud','docker','kubernetes','terraform','ansible','jenkins','ci/cd','github actions','gitlab ci',
+    'html','css','sass','less','tailwind','bootstrap','material ui','chakra ui','styled components',
+    'rest','graphql','websocket','grpc','api','microservices','soap','oauth','jwt',
+    'git','github','gitlab','bitbucket','svn','mercurial',
+    'agile','scrum','kanban','jira','confluence','slack','notion','trello','asana','linear',
+    'machine learning','deep learning','ai','neural network','nlp','computer vision','tensorflow','pytorch','keras','scikit-learn',
+    'data science','data analysis','data engineering','etl','spark','hadoop','kafka','airflow','tableau','power bi',
+    'testing','jest','mocha','cypress','playwright','selenium','unit test','integration test','tdd','bdd',
+    'linux','unix','bash','powershell','command line','vim','vscode','intellij','webstorm','eclipse',
+    'figma','sketch','adobe','photoshop','illustrator','ui/ux','product design','wireframe','prototype',
+    'leadership','management','team lead','mentoring','strategy','roadmap','stakeholder','cross-functional',
+    'communication','presentation','public speaking','writing','documentation','teaching','training',
+    'english','french','spanish','arabic','german','chinese','japanese',
+    'excel','word','powerpoint','outlook','google sheets','google docs','slack','teams','zoom',
+    'seo','sem','analytics','a/b testing','conversion','funnel','growth','marketing','content','social media',
+    'security','cybersecurity','encryption','authentication','authorization','penetration testing','compliance',
+    'blockchain','solidity','web3','crypto','smart contract','defi','nft',
+    'mobile','ios','android','flutter','react native','xcode','android studio','swift ui','jetpack compose',
+    'system design','architecture','scalability','performance','optimization','caching','load balancing','cd',
+    'problem solving','critical thinking','analytical','research','innovation','creativity','adaptability'
+  ];
+
+  const CV_SECTIONS = ['summary', 'profile', 'about', 'experience', 'work history', 'employment', 'education', 'academic',
+    'skills', 'technologies', 'competencies', 'projects', 'portfolio', 'certifications', 'certificates',
+    'publications', 'research', 'languages', 'interests', 'volunteer', 'achievements', 'awards',
+    'references', 'additional', 'leadership', 'training', 'courses', 'objective'];
+
+  function tokenize(text) {
+    return text.toLowerCase()
+      .replace(/[^a-z0-9\+#\.\-\/\s]/g, ' ')
+      .split(/\s+/)
+      .filter(t => t.length > 1);
+  }
+
+  function extractKeywordMatches(cvText, jdText) {
+    const cv = cvText.toLowerCase();
+    const jd = jdText.toLowerCase();
+    const result = [];
+    for (const kw of SKILL_KEYWORDS) {
+      if (jd.includes(kw)) {
+        const inCV = cv.includes(kw);
+        result.push({ keyword: kw, inJD: true, inCV, priority: 'match' });
+      }
+    }
+    return result;
+  }
+
+  function extractCustomKeywords(text) {
+    const tokens = tokenize(text);
+    const freq = {};
+    tokens.forEach(t => { freq[t] = (freq[t] || 0) + 1; });
+    return Object.entries(freq)
+      .filter(([w, f]) => w.length > 2 && f >= 2 && !['the','and','for','are','but','not','you','all','can','had','her','was','one','our','out','has','have','been','its','more','than','that','with','this','from','your','will','about','also','please','here','there','being','been','very','just','would','could','should','other','such','each','their','them','some','these','those','what','when','where','which','while','after','before','between','through','during','because','into','over','then','now','how','both','many','only','into','well','does','made','make','like','work','using','used','take','know','year','good','way','new','first','last','own','may','see','part','need','day','even','much','back','still','still','must','say','thing','think','come','going','want','look','find','give','tell','ask','call','set','put','move','live','run','let','keep','help','show','hear','play','turn','mean','move','long','small','high','large','old','high','high','light','hard','right','left','big','same','next','great','able','done','sure','enough','full','half','real','free','open','close','long','short','fast','slow','late','early','dark','clear','ready','true','fair','deep','poor','rich','thick','thin','wide','narrow','fine','flat','round','sharp','warm','cold','hot','cool','dry','wet','clean','dirty','soft','hard','heavy','light','dark','pale','bright','dim','dusty','empty','full','loud','quiet','brief','clean','tight','loose','tough','quick','slow','sweet','sour','bitter','salty','plain','blank','raw','smooth','rough','still','blank','chief','main','prime','simple','every','total','key','recent','current'].includes(w))
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 60)
+      .map(([w]) => w);
+  }
+
+  function identifyCvSections(text) {
+    const lines = text.split('\n');
+    const sections = [];
+    let currentSection = 'header';
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      const lower = trimmed.toLowerCase();
+      for (const sec of CV_SECTIONS) {
+        if (lower.includes(sec) && trimmed.length < 60) {
+          currentSection = sec;
+          sections.push({ section: sec, startLine: lines.indexOf(line) });
+          break;
+        }
+      }
+    }
+    return sections.length ? sections : [{ section: 'general', startLine: 0 }];
+  }
+
+  function assignSection(keyword, cvSections, cvText) {
+    const lower = cvText.toLowerCase();
+    const idx = lower.indexOf(keyword);
+    if (idx !== -1) {
+      const lineBefore = cvText.lastIndexOf('\n', idx);
+      const context = cvText.substring(Math.max(0, idx - 200), idx + keyword.length + 100).toLowerCase();
+      for (const sec of CV_SECTIONS) {
+        if (context.includes(sec)) return sec;
+      }
+    }
+    if (['python','javascript','java','react','angular','vue','docker','kubernetes','sql','aws','git',
+        'node.js','typescript','css','html','api','rest','graphql','mongodb','redis','testing'].includes(keyword)) {
+      return 'skills';
+    }
+    if (['management','leadership','team lead','mentoring','strategy','agile','scrum'].includes(keyword)) {
+      return 'experience';
+    }
+    if (['machine learning','data science','ai','deep learning','nlp'].includes(keyword)) {
+      return 'skills';
+    }
+    if (['english','french','arabic','spanish','german'].includes(keyword)) {
+      return 'languages';
+    }
+    if (['excel','word','powerpoint'].includes(keyword)) {
+      return 'skills';
+    }
+    return 'skills';
+  }
+
+  function generateSuggestion(keyword, section, cvText) {
+    const hasSomeExp = cvText.length > 200;
+    const tips = {
+      'skills': `Add "${keyword}" to your Skills section. List your proficiency level and include a concrete example of using it.`,
+      'experience': `Mention "${keyword}" in your Experience section. Describe a specific project or task where you used it.`,
+      'education': `If you studied "${keyword}" or a related field, highlight it in your Education section.`,
+      'summary': `Consider adding "${keyword}" to your professional summary to catch the recruiter's eye.`,
+      'projects': `Showcase "${keyword}" in a project. Describe the problem, your approach, and the outcome.`,
+      'certifications': `If you hold a certification in "${keyword}", list it. If not, consider getting one.`,
+      'languages': `If you speak this language, add it to your Languages section with your proficiency level.`,
+      'general': `Add "${keyword}" to the most relevant section of your CV. Provide context and measurable impact.`
+    };
+    return tips[section] || `Add "${keyword}" to the relevant section with a concrete example of your experience.`;
+  }
+
+  function analyzeCV(cvText, jdText) {
+    if (!jdText.trim()) throw new Error('Please paste a job description.');
+
+    const cv = cvText.trim();
+    const jd = jdText.trim();
+
+    // Extract keywords from JD
+    const jdKeywords = extractCustomKeywords(jd);
+    const skillKeywords = extractKeywordMatches(cv, jd);
+
+    // Find missing / weak / matched
+    const cvSections = identifyCvSections(cv);
+    const gaps = [];
+    let matchedCount = 0, missingCount = 0, weakCount = 0;
+
+    for (const kw of jdKeywords) {
+      const inCV = cv.includes(kw);
+      if (inCV) {
+        matchedCount++;
+        gaps.push({
+          keyword: kw,
+          status: 'matched',
+          priority: 'matched',
+          section: assignSection(kw, cvSections, cv),
+          suggestion: 'Present in your CV. Make sure it\'s prominent.'
+        });
+      } else {
+        // Check for partial matches
+        const partial = SKILL_KEYWORDS.filter(sk => sk.includes(kw) || kw.includes(sk));
+        if (partial.length > 0 && partial.some(p => cv.includes(p))) {
+          weakCount++;
+          gaps.push({
+            keyword: kw,
+            status: 'weak',
+            priority: 'nice-to-have',
+            section: assignSection(kw, cvSections, cv),
+            suggestion: `Not directly mentioned, but you have related skill "${partial.find(p => cv.includes(p))}". Consider adding "${kw}" explicitly.`
+          });
+        } else {
+          missingCount++;
+          const priority = (kw.length > 4 && jdKeywords.indexOf(kw) < 15) ? 'critical' : 'important';
+          const section = assignSection(kw, cvSections, cv);
+          gaps.push({
+            keyword: kw,
+            status: 'missing',
+            priority,
+            section,
+            suggestion: generateSuggestion(kw, section, cv)
+          });
+        }
+      }
+    }
+
+    // Also add skill-based gaps
+    for (const sk of skillKeywords) {
+      if (sk.inJD && !sk.inCV) {
+        const existing = gaps.find(g => g.keyword === sk.keyword);
+        if (!existing) {
+          missingCount++;
+          const section = assignSection(sk.keyword, cvSections, cv);
+          gaps.push({
+            keyword: sk.keyword,
+            status: 'missing',
+            priority: 'critical',
+            section,
+            suggestion: generateSuggestion(sk.keyword, section, cv)
+          });
+        }
+      } else if (sk.inJD && sk.inCV) {
+        const existing = gaps.find(g => g.keyword === sk.keyword);
+        if (!existing) {
+          matchedCount++;
+          gaps.push({
+            keyword: sk.keyword,
+            status: 'matched',
+            priority: 'matched',
+            section: assignSection(sk.keyword, cvSections, cv),
+            suggestion: 'Present in your CV.'
+          });
+        }
+      }
+    }
+
+    // Deduplicate
+    const seen = new Set();
+    const uniqueGaps = gaps.filter(g => {
+      const key = g.keyword;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    const total = uniqueGaps.length || 1;
+    const score = Math.round(((matchedCount + weakCount * 0.5) / total) * 100);
+    const cappedScore = Math.min(100, score);
+
+    // Generate section-specific suggestions
+    const sectionMap = {};
+    for (const g of uniqueGaps) {
+      if (g.status !== 'matched') {
+        const sec = g.section;
+        if (!sectionMap[sec]) sectionMap[sec] = [];
+        sectionMap[sec].push(g);
+      }
+    }
+
+    return {
+      score: cappedScore,
+      matched: matchedCount,
+      missing: missingCount,
+      weak: weakCount,
+      totalKeywords: total,
+      gapItems: uniqueGaps,
+      sectionSuggestions: sectionMap,
+      jdKeywords: jdKeywords
+    };
+  }
+
+  // ── Render Results ───────────────────────────────────────
+  function renderResults(result) {
+    // Score ring
+    const ring = document.getElementById('scoreRing');
+    document.getElementById('scoreValue').textContent = result.score;
+    ring.className = 'score-ring';
+    if (result.score >= 80) ring.classList.add('excellent');
+    else if (result.score >= 60) ring.classList.add('high');
+    else if (result.score >= 40) ring.classList.add('medium');
+    else ring.classList.add('low');
+
+    // Score label
+    let label = 'Strong Match', summary = 'Your CV covers most requirements.';
+    if (result.score < 80) { label = 'Good Match'; summary = 'Your CV covers the key areas but needs some tuning.'; }
+    if (result.score < 60) { label = 'Partial Match'; summary = 'Your CV needs moderate adjustments to align with this role.'; }
+    if (result.score < 40) { label = 'Weak Match'; summary = 'Significant gaps found. Prioritise filling the critical items below.'; }
+    document.getElementById('scoreLabel').textContent = label;
+    document.getElementById('scoreSummary').textContent = summary;
+
+    // Stats
+    document.getElementById('statMatched').textContent = result.matched;
+    document.getElementById('statMissing').textContent = result.missing;
+    document.getElementById('statWeak').textContent = result.weak;
+    document.getElementById('statKeywords').textContent = result.totalKeywords;
+
+    // Gap list
+    const gapList = document.getElementById('gapList');
+    gapList.innerHTML = '';
+    const priorities = { critical: [], important: [], 'nice-to-have': [], matched: [] };
+    const order = ['critical', 'important', 'nice-to-have', 'matched'];
+    for (const g of result.gapItems) {
+      if (priorities[g.priority]) priorities[g.priority].push(g);
+    }
+    for (const p of order) {
+      for (const g of priorities[p]) {
+        const div = document.createElement('div');
+        div.className = `gap-item ${g.status}`;
+        const icon = g.status === 'matched'
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+        div.innerHTML = `
+          <div class="gap-item-header">
+            ${icon}
+            <span class="gap-name">${g.keyword}</span>
+            <span class="zone-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+              ${g.section.charAt(0).toUpperCase() + g.section.slice(1)}
+            </span>
+            <span class="gap-priority ${g.status === 'matched' ? 'matched' : g.priority}">${g.status === 'matched' ? '✓' : g.priority}</span>
+          </div>
+          <div class="gap-suggestion">${g.suggestion}</div>
+        `;
+        gapList.appendChild(div);
+      }
+    }
+
+    // Section suggestions
+    const sectionSuggestions = document.getElementById('sectionSuggestions');
+    sectionSuggestions.innerHTML = '';
+    const sectionKeys = Object.keys(result.sectionSuggestions);
+    if (sectionKeys.length === 0) {
+      sectionSuggestions.innerHTML = '<p style="color:var(--green);font-weight:500;">✓ No missing items to add.</p>';
+    } else {
+      for (const sec of sectionKeys) {
+        const items = result.sectionSuggestions[sec];
+        const div = document.createElement('div');
+        div.className = 'section-suggestion';
+        div.innerHTML = `
+          <h4>${sec.charAt(0).toUpperCase() + sec.slice(1)} Section</h4>
+          <p>Add the following keywords/technologies to this section:</p>
+          <ul>${items.map(g => `<li><strong>${g.keyword}</strong> — ${g.suggestion.replace(`"${g.keyword}"`, '').replace('Add ', 'Add ')}</li>`).join('')}</ul>
+        `;
+        sectionSuggestions.appendChild(div);
+      }
+    }
+
+    // Keywords cloud
+    const kwContainer = document.getElementById('keywordTags');
+    kwContainer.innerHTML = '';
+    const allKeywords = [...new Set([...result.jdKeywords, ...result.gapItems.map(g => g.keyword)])];
+    for (const kw of allKeywords) {
+      const span = document.createElement('span');
+      span.className = 'tag';
+      const gap = result.gapItems.find(g => g.keyword === kw);
+      span.classList.add(gap ? (gap.status === 'matched' ? 'match' : gap.status === 'weak' ? 'weak' : 'miss') : 'miss');
+      span.textContent = kw;
+      kwContainer.appendChild(span);
+    }
+
+    // Show results
+    document.getElementById('resultsCard').classList.remove('hidden');
+    document.getElementById('emptyState').classList.add('hidden');
+    document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── Analyze Button ───────────────────────────────────────
+  document.getElementById('analyzeBtn').addEventListener('click', async () => {
+    const jd = document.getElementById('jdText').value;
+    let cv = cvText.value.trim();
+
+    if (cvFileData) {
+      const overlay = document.getElementById('loadingOverlay');
+      overlay.classList.add('active');
+      try {
+        cv = await extractTextFromFile(cvFileData);
+      } catch (e) {
+        overlay.classList.remove('active');
+        alert('Error reading file: ' + e.message);
+        return;
+      }
+      overlay.classList.remove('active');
+    }
+
+    cv = cv.trim();
+    if (!cv) { alert('Please upload a CV or paste its text.'); return; }
+    if (!jd) { alert('Please paste a job description.'); return; }
+
+    document.getElementById('loadingOverlay').classList.add('active');
+    document.getElementById('analyzeBtn').disabled = true;
+    document.getElementById('analyzeBtn').innerHTML = '<span class="spinner"></span> Analyzing…';
+
+    setTimeout(() => {
+      try {
+        const result = analyzeCV(cv, jd);
+        renderResults(result);
+      } catch (e) {
+        alert('Analysis error: ' + e.message);
+      }
+      document.getElementById('loadingOverlay').classList.remove('active');
+      document.getElementById('analyzeBtn').disabled = false;
+      document.getElementById('analyzeBtn').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Analyze CV';
+    }, 50);
+  });
+
+  // ── Reset ────────────────────────────────────────────────
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    removeCVFile();
+    cvText.value = '';
+    document.getElementById('jdText').value = '';
+    document.getElementById('resultsCard').classList.add('hidden');
+    document.getElementById('emptyState').classList.remove('hidden');
+  });
+</script>
+</body>
+</html>
